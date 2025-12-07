@@ -1,0 +1,16 @@
+# IDE files
+.idea/
+
+# Build output
+build/
+out/
+target/
+
+# Log files
+*.log
+
+# Dependency caches
+.mvn/
+
+# OS-specific files
+.DS_Store
