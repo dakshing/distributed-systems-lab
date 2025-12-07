@@ -6,6 +6,8 @@ import com.dsl.urlshortener.handler.ShortenerHandler;
 import com.dsl.urlshortener.repository.ScyllaUrlRepository;
 import com.dsl.urlshortener.repository.UrlRepository;
 import com.dsl.urlshortener.server.NettyServer;
+import io.micrometer.prometheusmetrics.PrometheusConfig;
+import io.micrometer.prometheusmetrics.PrometheusMeterRegistry;
 
 import java.net.InetSocketAddress;
 
@@ -36,7 +38,9 @@ public class Application {
 
         UrlRepository repository = new ScyllaUrlRepository(session);
 
-        ShortenerHandler shortenerHandler = new ShortenerHandler(idGenerator, repository, host);
+        PrometheusMeterRegistry meterRegistry = new PrometheusMeterRegistry(PrometheusConfig.DEFAULT);
+
+        ShortenerHandler shortenerHandler = new ShortenerHandler(idGenerator, repository, host, meterRegistry);
 
         NettyServer<ShortenerHandler> server = new NettyServer<>(port, shortenerHandler);
         server.start();

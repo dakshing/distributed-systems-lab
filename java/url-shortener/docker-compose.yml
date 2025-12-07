@@ -33,5 +33,25 @@ services:
       scylla:
         condition: service_healthy
 
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: shortener-prom
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    depends_on:
+      - url-shortener
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: shortener-grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    depends_on:
+      - prometheus
+
 volumes:
   scylla-data:

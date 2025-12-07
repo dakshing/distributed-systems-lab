@@ -19,6 +19,7 @@
         <netty.version>4.2.7.Final</netty.version>
         <datastax.version>4.17.0</datastax.version>
         <slf4j.version>2.0.12</slf4j.version>
+        <micrometer-prometheus.version>1.16.0</micrometer-prometheus.version>
     </properties>
 
     <dependencies>
@@ -44,6 +45,12 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>
             <version>${slf4j.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-registry-prometheus</artifactId>
+            <version>${micrometer-prometheus.version}</version>
         </dependency>
     </dependencies>
 

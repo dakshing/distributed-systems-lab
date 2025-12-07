@@ -3,6 +3,8 @@ package com.dsl.urlshortener.handler;
 import com.dsl.common.baseencoder.Base62Encoder;
 import com.dsl.common.idgenerator.SnowflakeIdGenerator;
 import com.dsl.urlshortener.repository.UrlRepository;
+import io.micrometer.core.instrument.Timer;
+import io.micrometer.prometheusmetrics.PrometheusMeterRegistry;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandler;
@@ -11,17 +13,25 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.*;
 import io.netty.util.CharsetUtil;
 
+import java.time.Duration;
+
 @ChannelHandler.Sharable
 public class ShortenerHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
 
     private final SnowflakeIdGenerator idGenerator;
     private final UrlRepository repository;
     private final String domain;
+    private final PrometheusMeterRegistry meterRegistry;
+    private final Timer shortenTimer;
+    private final Timer redirectTimer;
 
-    public ShortenerHandler(SnowflakeIdGenerator idGenerator, UrlRepository repository, String domain) {
+    public ShortenerHandler(SnowflakeIdGenerator idGenerator, UrlRepository repository, String domain, PrometheusMeterRegistry meterRegistry) {
         this.idGenerator = idGenerator;
         this.repository = repository;
         this.domain = domain;
+        this.meterRegistry = meterRegistry;
+        this.shortenTimer = meterRegistry.timer("http_requests", "endpoint", "shorten");
+        this.redirectTimer = meterRegistry.timer("http_requests", "endpoint", "redirect");
     }
 
     @Override
@@ -29,10 +39,19 @@ public class ShortenerHandler extends SimpleChannelInboundHandler<FullHttpReques
         HttpMethod method = request.method();
         String uri = request.uri();
 
+        if ("/metrics".equals(uri)) {
+            sendResponse(handlerContext, HttpResponseStatus.OK, meterRegistry.scrape());
+            return;
+        }
+
+        long startTime = System.nanoTime();
+
         if (HttpMethod.POST.equals(method) && "/shorten".equals(uri)) {
             handleShortenRequest(handlerContext, request);
+            shortenTimer.record(Duration.ofNanos(System.nanoTime() - startTime));
         } else if (HttpMethod.GET.equals(method) && uri.length() > 1) {
             handleRedirectRequest(handlerContext, uri.substring(1)); // Remove leading '/'
+            redirectTimer.record(Duration.ofNanos(System.nanoTime() - startTime));
         } else {
             sendResponse(handlerContext, HttpResponseStatus.NOT_FOUND, "Endpoint not found");
         }
@@ -75,6 +94,6 @@ public class ShortenerHandler extends SimpleChannelInboundHandler<FullHttpReques
                 HttpVersion.HTTP_1_1, status, Unpooled.copiedBuffer(content, CharsetUtil.UTF_8));
         response.headers().set(HttpHeaderNames.CONTENT_TYPE, "text/plain");
         response.headers().set(HttpHeaderNames.CONTENT_LENGTH, response.content().readableBytes());
-        handlerContext.writeAndFlush(response);
+        handlerContext.writeAndFlush(response).addListener(ChannelFutureListener.CLOSE);
     }
 }
