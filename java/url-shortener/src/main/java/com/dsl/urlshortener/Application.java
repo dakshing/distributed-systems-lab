@@ -12,13 +12,19 @@ import java.net.InetSocketAddress;
 public class Application {
     public static void main(String[] args) throws Exception {
         int port = 8080;
-        int nodeId = 1; // Unique Server ID
         String host = "http://localhost:" + port + "/";
 
-        System.out.println("Connecting to ScyllaDB...");
+        String scyllaHost = System.getenv("SCYLLA_HOST");
+        if (scyllaHost == null) {
+            scyllaHost = "127.0.0.1";
+        }
+
+        int nodeId = Integer.parseInt(System.getenv("NODE_ID"));
+
+        System.out.println("Connecting to ScyllaDB at " + scyllaHost + "...");
 
         CqlSession session = CqlSession.builder()
-                .addContactPoint(new InetSocketAddress("127.0.0.1", 9042))
+                .addContactPoint(new InetSocketAddress(scyllaHost, 9042))
                 .withLocalDatacenter("datacenter1")
                 .build();
 

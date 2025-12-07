@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  scylla:
+    image: scylladb/scylla:5.2
+    container_name: scylla-node1
+    # SAFETY LIMITS FOR LAPTOP DEV:
+    # --smp 1: Use only 1 CPU core
+    # --memory 750M: Use only 750MB RAM
+    command: --smp 1 --memory 750M --overprovisioned 1 --api-address 0.0.0.0
+    ports:
+      - "9042:9042"
+    volumes:
+      - scylla-data:/var/lib/scylla
+    healthcheck:
+      test: ["CMD-SHELL", "cqlsh -e 'DESCRIBE KEYSPACES'"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+
+  url-shortener:
+    build:
+      context: ..
+      dockerfile: url-shortener/Dockerfile
+    container_name: url-shortener
+    ports:
+      - "8080:8080"
+    environment:
+      - SCYLLA_HOST=scylla
+      - JAVA_TOOL_OPTIONS="-Xmx512m"
+      - NODE_ID=1
+    depends_on:
+      scylla:
+        condition: service_healthy
+
+volumes:
+  scylla-data:
