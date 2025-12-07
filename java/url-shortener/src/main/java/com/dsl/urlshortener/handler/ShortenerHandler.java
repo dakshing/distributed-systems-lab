@@ -49,7 +49,7 @@ public class ShortenerHandler extends SimpleChannelInboundHandler<FullHttpReques
         // Core Logic: ID -> Base62 -> Store
         long id = idGenerator.nextId();
         String shortUrl = Base62Encoder.encode(id);
-        repository.save(shortUrl, originalUrl);
+        repository.save(id, shortUrl, originalUrl);
 
         String responseBody = domain + shortUrl;
         sendResponse(handlerContext, HttpResponseStatus.OK, responseBody);

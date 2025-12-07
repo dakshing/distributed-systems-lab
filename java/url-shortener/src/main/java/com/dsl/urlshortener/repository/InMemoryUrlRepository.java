@@ -8,7 +8,7 @@ public class InMemoryUrlRepository implements UrlRepository {
     private final Map<String, String> storage = new ConcurrentHashMap<>();
 
     @Override
-    public void save(String shortUrl, String originalUrl) {
+    public void save(long id, String shortUrl, String originalUrl) {
         storage.put(shortUrl, originalUrl);
     }
 

@@ -1,10 +1,13 @@
 package com.dsl.urlshortener;
 
+import com.datastax.oss.driver.api.core.CqlSession;
 import com.dsl.common.idgenerator.SnowflakeIdGenerator;
 import com.dsl.urlshortener.handler.ShortenerHandler;
-import com.dsl.urlshortener.repository.InMemoryUrlRepository;
+import com.dsl.urlshortener.repository.ScyllaUrlRepository;
 import com.dsl.urlshortener.repository.UrlRepository;
 import com.dsl.urlshortener.server.NettyServer;
+
+import java.net.InetSocketAddress;
 
 public class Application {
     public static void main(String[] args) throws Exception {
@@ -12,16 +15,38 @@ public class Application {
         int nodeId = 1; // Unique Server ID
         String host = "http://localhost:" + port + "/";
 
+        System.out.println("Connecting to ScyllaDB...");
+
+        CqlSession session = CqlSession.builder()
+                .addContactPoint(new InetSocketAddress("127.0.0.1", 9042))
+                .withLocalDatacenter("datacenter1")
+                .build();
+
+        initializeSchema(session);
+
         System.out.println("Initializing system components...");
 
         SnowflakeIdGenerator idGenerator = new SnowflakeIdGenerator(nodeId);
 
-        UrlRepository repository = new InMemoryUrlRepository();
+        UrlRepository repository = new ScyllaUrlRepository(session);
 
         ShortenerHandler shortenerHandler = new ShortenerHandler(idGenerator, repository, host);
 
         NettyServer<ShortenerHandler> server = new NettyServer<>(port, shortenerHandler);
         server.start();
+    }
+
+    private static void initializeSchema(CqlSession session) {
+        session.execute("CREATE KEYSPACE IF NOT EXISTS shortener " +
+                "WITH replication = {'class': 'SimpleStrategy', 'replication_factor': 1}");
+
+        session.execute("CREATE TABLE IF NOT EXISTS shortener.urls (" +
+                "short_url text PRIMARY KEY, " +
+                "original_url text, " +
+                "id bigint, " +
+                "created_at timestamp)");
+
+        System.out.println("Schema initialized.");
     }
 }
 
