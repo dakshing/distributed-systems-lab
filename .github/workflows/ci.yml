@@ -2,7 +2,7 @@ name: Distributed Systems CI
 
 on:
   push:
-    branches: [ "main", "feature-url-shortener-design" ]
+    branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
 
