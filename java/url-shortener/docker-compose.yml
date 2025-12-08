@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  scylla:
+    image: scylladb/scylla:5.2
+    container_name: scylla-node1
+    # SAFETY LIMITS FOR LAPTOP DEV:
+    # --smp 1: Use only 1 CPU core
+    # --memory 750M: Use only 750MB RAM
+    command: --smp 1 --memory 750M --overprovisioned 1 --api-address 0.0.0.0
+    ports:
+      - "9042:9042"
+    volumes:
+      - scylla-data:/var/lib/scylla
+    healthcheck:
+      test: ["CMD-SHELL", "cqlsh -e 'DESCRIBE KEYSPACES'"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+
+  url-shortener:
+    build:
+      context: ..
+      dockerfile: url-shortener/Dockerfile
+    container_name: url-shortener
+    ports:
+      - "8080:8080"
+    environment:
+      - SCYLLA_HOST=scylla
+      - JAVA_TOOL_OPTIONS="-Xmx512m"
+      - NODE_ID=1
+    depends_on:
+      scylla:
+        condition: service_healthy
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: shortener-prom
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    depends_on:
+      - url-shortener
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: shortener-grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    depends_on:
+      - prometheus
+
+volumes:
+  scylla-data:
