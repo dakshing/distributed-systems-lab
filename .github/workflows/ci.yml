@@ -22,20 +22,14 @@ jobs:
           distribution: 'temurin'
           cache: maven
 
-      # 3. Build & Install 'dsl-common'
-      - name: Build Common Module
-        run: |
-          cd java/dsl-common
-          mvn clean install -DskipTests
+      # 3. Install Root POM
+      - name: Install Root POM
+        run: mvn clean install -DskipTests -f java/pom.xml
 
-      # 4. Test 'dsl-common'
-      - name: Test Common Module
-        run: |
-          cd java/dsl-common
-          mvn test
+      # 4. Build & Install 'dsl-common'
+      - name: Build & Test Common Module
+        run: mvn clean install -DskipTests -f java/dsl-common/pom.xml
 
       # 5. Build & Test 'url-shortener'
       - name: Build & Test URL Shortener
-        run: |
-          cd java/url-shortener
-          mvn clean package
+        run: mvn clean package -f java/url-shortener/pom.xml
