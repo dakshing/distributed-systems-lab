@@ -19,7 +19,7 @@ A distributed unique ID generator inspired by Twitter's Snowflake algorithm.
 ### Bit Layout (64-bit *long*)
 The ID is composed of 64 bits, allowing for time-sorting and distributed generation.
 
-![snowflake_bit_layout.png](docs/assets/snowflake_bit_layout.png)
+![snowflake_bit_layout.png](../../docs/assets/snowflake_bit_layout.png)
 
 ### Handling Clock Drift (NTP)
 Distributed systems rely on NTP, which can sometimes move the system clock backwards to sync with the global time. This creates a risk of generating duplicate IDs.
