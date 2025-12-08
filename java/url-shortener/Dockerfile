@@ -17,6 +17,7 @@ FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
 
 COPY --from=build /app/url-shortener/target/url-shortener-1.0-SNAPSHOT.jar app.jar
+COPY --from=build /app/url-shortener/target/lib lib
 
 # Run it
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-cp", "app.jar:lib/*", "com.dsl.urlshortener.Application"]
