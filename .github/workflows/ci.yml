@@ -28,7 +28,7 @@ jobs:
 
       # 4. Build & Install 'dsl-common'
       - name: Build & Test Common Module
-        run: mvn clean install -DskipTests -f java/dsl-common/pom.xml
+        run: mvn clean install -f java/dsl-common/pom.xml
 
       # 5. Build & Test 'url-shortener'
       - name: Build & Test URL Shortener
