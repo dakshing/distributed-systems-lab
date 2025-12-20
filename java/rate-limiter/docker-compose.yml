@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # 1. Redis
   redis:
@@ -7,6 +5,8 @@ services:
     container_name: limiter-redis
     ports:
       - "6379:6379"
+    networks:
+      - dsl-net
 
   # 2. Rate Limiter App
   app:
@@ -15,8 +15,15 @@ services:
       context: ..
       dockerfile: rate-limiter/Dockerfile
     ports:
-      - "8080:8080"
+      - "8081:8081"
     depends_on:
       - redis
     environment:
       - REDIS_HOST=redis
+      - PORT=8081
+    networks:
+      - dsl-net
+
+networks:
+  dsl-net:
+    external: true

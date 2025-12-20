@@ -2,11 +2,11 @@ package com.dsl.urlshortener;
 
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.dsl.common.idgenerator.SnowflakeIdGenerator;
+import com.dsl.observability.DslMetrics;
 import com.dsl.urlshortener.handler.ShortenerHandler;
 import com.dsl.urlshortener.repository.ScyllaUrlRepository;
 import com.dsl.urlshortener.repository.UrlRepository;
 import com.dsl.urlshortener.server.NettyServer;
-import io.micrometer.prometheusmetrics.PrometheusConfig;
 import io.micrometer.prometheusmetrics.PrometheusMeterRegistry;
 
 import java.net.InetSocketAddress;
@@ -38,7 +38,7 @@ public class Application {
 
         UrlRepository repository = new ScyllaUrlRepository(session);
 
-        PrometheusMeterRegistry meterRegistry = new PrometheusMeterRegistry(PrometheusConfig.DEFAULT);
+        PrometheusMeterRegistry meterRegistry = DslMetrics.getInstance();
 
         ShortenerHandler shortenerHandler = new ShortenerHandler(idGenerator, repository, host, meterRegistry);
 
