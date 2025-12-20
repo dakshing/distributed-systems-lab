@@ -65,6 +65,8 @@ A high-throughput, low-latency URL Shortener service built from scratch in Java.
 This spins up the App, ScyllaDB, Prometheus, and Grafana as docker containers.
 
 ```bash
+    cd java/dsl-observability
+    docker-compose up --build
     cd java/url-shortener
     docker-compose up --build
 ```
