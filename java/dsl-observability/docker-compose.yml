@@ -1,0 +1,25 @@
+services:
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: dsl-prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    networks:
+      - dsl-net
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: dsl-grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    networks:
+      - dsl-net
+
+networks:
+  dsl-net:
+    name: dsl-net
+    driver: bridge

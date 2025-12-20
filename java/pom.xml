@@ -10,6 +10,7 @@
 
     <modules>
         <module>dsl-common</module>
+        <module>dsl-observability</module>
         <module>url-shortener</module>
         <module>rate-limiter</module>
     </modules>
