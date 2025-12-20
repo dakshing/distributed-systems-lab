@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  # 1. Redis
+  redis:
+    image: redis:alpine
+    container_name: limiter-redis
+    ports:
+      - "6379:6379"
+
+  # 2. Rate Limiter App
+  app:
+    container_name: rate-limiter-app
+    build:
+      context: ..
+      dockerfile: rate-limiter/Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      - redis
+    environment:
+      - REDIS_HOST=redis
