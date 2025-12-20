@@ -73,3 +73,4 @@ scrape_configs:
     static_configs:
       - targets: ['container-name:port']
 ```
+
