@@ -11,6 +11,7 @@ This module serves as the **Central Nervous System** for the Distributed Systems
 The system follows a **Pull-Based** monitoring architecture. Applications expose a `/metrics` endpoint, and the central Prometheus server scrapes them over the shared internal network.
 
 ```mermaid
+%%{init: {'theme': 'neutral'} }%%
 graph TD
     subgraph "Shared Network (dsl-net)"
         Service1[Service 1]
