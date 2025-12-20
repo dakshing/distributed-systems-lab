@@ -74,3 +74,5 @@ scrape_configs:
       - targets: ['container-name:port']
 ```
 
+## Prometheus Target Health Dashboard
+![prometheus_targets.png](../../docs/assets/observability/prometheus_targets.png)
