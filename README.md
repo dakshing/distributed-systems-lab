@@ -10,9 +10,10 @@ Instead of assuming a database scales, we **choose the DB**, implement the schem
 
 ## Modules & Status
 
-| Module                                         | Description                                       | Key Tech                  | Status             |
-|:-----------------------------------------------|:--------------------------------------------------|:--------------------------|:-------------------|
-| **[Common Libraries](java/dsl-common)** (Java) | Shared utility libraries for distributed systems. | Distributed ID Generator  | ✅ **Completed**    |
-| **[URL Shortener](java/url-shortener)**        | Distributed URL Shortener service                 | Netty, ScyllaDB           | ✅ **Completed**    |
-| **[Rate Limiter](java/rate-limiter)**          | Distributed sliding window rate limiter.          | Redis (Lua), Token Bucket | 🚧 **In Progress** |
+| Module                                         | Description                                              | Key Tech                          | Status                |
+|:-----------------------------------------------|:---------------------------------------------------------|:----------------------------------|:----------------------|
+| **[Common Libraries](java/dsl-common)** (Java) | Shared utility libraries for distributed systems.        | Distributed ID Generator          | ✅ **Completed**      |
+| **[Observability](java/dsl-observability)**    | Central monitoring infrastructure & shared metrics lib.  | Prometheus, Grafana               | ✅ **Completed**      |
+| **[URL Shortener](java/url-shortener)**        | Distributed URL Shortener service                        | Netty, ScyllaDB                   | ✅ **Completed**      |
+| **[Rate Limiter](java/rate-limiter)**          | Distributed sliding window rate limiter.                 | Redis (Lua), Token Bucket         | 🚧 **In Progress**    |
 
