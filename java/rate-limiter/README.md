@@ -29,32 +29,8 @@ It implements a **Inter-changeable Strategy Pattern**, allowing you to hot-swap 
 ---
 
 ## Architecture
+![rate_limiter.png](../../docs/assets/rate_limiter.png)
 
-```mermaid
-%%{init: {'theme': 'neutral'} }%%
-graph TD
-    User[Client]
-    
-    subgraph "Rate Limiter"
-        Server[Netty Server]
-        Handler[Rate Limiter Handler]
-        Strategy[Strategy Interface]
-        
-        Server --> Handler
-        Handler --> Strategy
-    end
-
-    subgraph "Infrastructure"
-        Redis[(Redis Cache)]
-        Lua[Lua Script]
-    end
-
-    User -- "Request user=alice" --> Server
-    Strategy -- "EVALSHA (Atomic)" --> Redis
-    Redis -- "Executes" --> Lua
-    Lua -- "1 (Allow) / 0 (Deny)" --> Strategy
-    Strategy -- "200 OK / 429 Too Many Requests" --> User
-```
 ## Supported Algorithms
 The service is designed to be algorithm-agnostic. The currently active algorithm is loaded at startup via RateLimiterFactory.
 
